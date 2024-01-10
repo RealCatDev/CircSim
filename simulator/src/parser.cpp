@@ -2,11 +2,12 @@
 
 namespace CircSim {
 
+  Parser::Parser(std::unique_ptr<Lexer> lexer) : m_Tokens(lexer->GetTokens()) {}
+
   std::unique_ptr<AstNode> Parser::Parse() {
     std::unique_ptr<AstNode> root = std::make_unique<AstNode>();
     root->type = AST_ROOT;
     while (m_Tok.type != TOKN_EOF) root->children.push_back(ParseCircuit());
-
     return root;
   }
 
@@ -35,16 +36,12 @@ namespace CircSim {
     eat(TOKN_IN, "Expected IN but instead got \"" + m_Tok.value + "\"!");
     eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
     res->value += m_Tok.value;
-    advance();
-    std::cout << m_Tok.type << " : " << m_Tok.value << std::endl;
-    while (m_Tok.type == TOKN_COMMA) {
-      std::cout << peek(1).type << std::endl;
-      eat(TOKN_COMMA, "bro");
-      eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
-      res->value += m_Tok.value;
+
+    while (peek(0).type == TOKN_COMMA) {
       advance();
+      eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
+      res->value += " " + m_Tok.value;
     }
-    std::cout << m_Tok.type << " : " << m_Tok.value << std::endl;
 
     return res;
   }
@@ -56,12 +53,13 @@ namespace CircSim {
     eat(TOKN_OUT, "Expected OUT but instead got \"" + m_Tok.value + "\"!");
     eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
     res->value += m_Tok.value;
-    while (peek(1).type == TOKN_COMMA) {
-      eat(TOKN_COMMA);
+
+    while (peek(0).type == TOKN_COMMA) {
+      advance();
       eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
-      res->value += ", " + m_Tok.value;
+      res->value += " " + m_Tok.value;
     }
-    
+
     return res;
   }
 
@@ -72,7 +70,7 @@ namespace CircSim {
     
     if (tok.type != TOKN_TRUTH && tok.type != TOKN_LOGIC) throw std::runtime_error("Expected circuit body (TRUTH or LOGIC) but instead got \"" + tok.value + "\"");
 
-    res->type = (AstType)tok.type;
+    res->type = static_cast<AstType>(tok.type);
     eat(tok.type);
     eat(TOKN_COLON);
     if (tok.type == TOKN_TRUTH) {
@@ -92,22 +90,47 @@ namespace CircSim {
 
     while (m_Tok.type != TOKN_SEMI) {
       if (m_Tok.type == TOKN_PIPE) {
+        advance();
         if (onOutput) throw std::runtime_error("Unexpected token \"|\"!");
         onOutput = true;
       } else {
         if (onOutput) outs++;
         else ins++;
-        eat(TOKN_ID, "bruh");
+        if (m_Tok.type != TOKN_ID) throw std::runtime_error("Bad token!");
+        advance();
         std::unique_ptr<AstNode> column = std::make_unique<AstNode>();
         column->type = AST_TRUTH_COL;
-        column->value = (int)onOutput;
+        column->value = onOutput?"i":"o";
         res->children.push_back(std::move(column));
       }
     }
-    eat(TOKN_SEMI, "bruh, how have you managed to trick my program that bad?");
+    advance();
     
-    while (m_Tok.type == TOKN_ID) {
+    bool loop = true, first = true;
+    while (loop) {
+      if (!first) {
+        if (m_Tok.type != TOKN_COMMA) { loop = false; }
+        else advance();
+        std::cout << m_Tok.type << std::endl;
+      }
 
+      std::vector<std::string> inputs{}, outputs{};
+      for (uint32_t i = 0; i < ins; ++i) {
+        if (m_Tok.type != TOKN_NUMBER) throw std::runtime_error("DON'T!");
+        inputs.push_back(m_Tok.value);
+        advance();
+      }
+
+      if (m_Tok.type != TOKN_PIPE) throw std::runtime_error("no!");
+      advance();
+
+      for (uint32_t i = 0; i < outs; ++i) {
+        std::cout << m_Tok.type << std::endl;
+        if (m_Tok.type != TOKN_NUMBER) throw std::runtime_error("DON'T!");
+        outputs.push_back(m_Tok.value);
+        advance();
+      }
+      first = false;
     }
 
     return res;
@@ -115,6 +138,22 @@ namespace CircSim {
   
   std::unique_ptr<AstNode> Parser::ParseLogic() {
     return nullptr;
+  }
+
+  Token Parser::advance() {
+    return m_Tok = m_Tokens[m_Index++];
+  }
+
+  Token Parser::peek(int off) {
+    return m_Tokens[m_Index + off];
+  }
+
+  bool Parser::eat(TokenType type) {
+    return advance().type == type;
+  }
+
+  void Parser::eat(TokenType type, const std::string& errMsg) {
+    if (!eat(type)) throw std::runtime_error(errMsg);
   }
 
 }
