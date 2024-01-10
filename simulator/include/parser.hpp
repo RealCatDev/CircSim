@@ -22,15 +22,9 @@ namespace CircSim {
 
   class Parser {
   public:
-    Parser(std::unique_ptr<Lexer> lexer) : m_Tokens(lexer->Tokenize()) {}
+    Parser(std::unique_ptr<Lexer> lexer) : m_Tokens(lexer->GetTokens()) {}
 
-    std::unique_ptr<AstNode> Parse() {
-      std::unique_ptr<AstNode> root;
-      
-
-
-      return root;
-    }
+    std::unique_ptr<AstNode> Parse();
 
   private:
     std::vector<Token> m_Tokens{};

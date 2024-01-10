@@ -5,6 +5,8 @@
 #include "parser.hpp"
 #include "simulator.hpp"
 
+#include <string>
+
 using namespace CircSim;
 
 int main(int argc, char **argv) {
@@ -19,7 +21,9 @@ int main(int argc, char **argv) {
   }
 
   std::unique_ptr<Lexer> lexer = std::make_unique<Lexer>(argv[1]);
-  lexer->Tokenize();
-
+  for (auto tok : lexer->GetTokens()) {
+    std::cout << "Token " << tok.value << " at " << std::to_string(tok.line) << ":" << std::to_string(tok.col) << std::endl;
+  }
+  
   return 0;
 }
