@@ -60,6 +60,17 @@ namespace CircSim {
         tok.value += m_Char;
         advance();
       }
+
+      if (tok.value == "CIRCUIT")
+        tok.type = TOKN_CIRCUIT;
+      else if (tok.value == "IN")
+        tok.type = TOKN_IN;
+      else if (tok.value == "OUT")
+        tok.type = TOKN_OUT;
+      else if (tok.value == "TRUTH")
+        tok.type = TOKN_TRUTH;
+      else if (tok.value == "LOGIC")
+        tok.type = TOKN_LOGIC;
     }
 
     else {

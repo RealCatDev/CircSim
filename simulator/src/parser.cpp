@@ -30,8 +30,21 @@ namespace CircSim {
   std::unique_ptr<AstNode> Parser::ParseIn() {
     std::unique_ptr<AstNode> res = std::make_unique<AstNode>();
     res->type = AST_IN;
+    res->value = "";
 
     eat(TOKN_IN, "Expected IN but instead got \"" + m_Tok.value + "\"!");
+    eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
+    res->value += m_Tok.value;
+    advance();
+    std::cout << m_Tok.type << " : " << m_Tok.value << std::endl;
+    while (m_Tok.type == TOKN_COMMA) {
+      std::cout << peek(1).type << std::endl;
+      eat(TOKN_COMMA, "bro");
+      eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
+      res->value += m_Tok.value;
+      advance();
+    }
+    std::cout << m_Tok.type << " : " << m_Tok.value << std::endl;
 
     return res;
   }
@@ -41,7 +54,14 @@ namespace CircSim {
     res->type = AST_OUT;
 
     eat(TOKN_OUT, "Expected OUT but instead got \"" + m_Tok.value + "\"!");
-
+    eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
+    res->value += m_Tok.value;
+    while (peek(1).type == TOKN_COMMA) {
+      eat(TOKN_COMMA);
+      eat(TOKN_ID, "Expected ID but instead got \"" + m_Tok.value + "\"!");
+      res->value += ", " + m_Tok.value;
+    }
+    
     return res;
   }
 

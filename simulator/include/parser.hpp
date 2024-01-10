@@ -48,7 +48,7 @@ namespace CircSim {
     }
 
     bool eat(TokenType type) {
-      return advance().type == type; 
+      return advance().type == type;
     }
 
     void eat(TokenType type, std::string errMsg) {

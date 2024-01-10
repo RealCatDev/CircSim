@@ -21,9 +21,8 @@ int main(int argc, char **argv) {
   }
 
   std::unique_ptr<Lexer> lexer = std::make_unique<Lexer>(argv[1]);
-  for (auto tok : lexer->GetTokens()) {
-    std::cout << "Token " << tok.value << " at " << std::to_string(tok.line) << ":" << std::to_string(tok.col) << std::endl;
-  }
+  std::unique_ptr<Parser> parser = std::make_unique<Parser>(std::move(lexer));
+  auto root = parser->Parse();
   
   return 0;
 }
