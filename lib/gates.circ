@@ -2,7 +2,7 @@ CIRCUIT(AND)
 IN A, B
 OUT O
 TRUTH:
-  A B | O
+  A B | O;
   0 0 | 0
   1 0 | 0
   0 1 | 0
@@ -12,7 +12,7 @@ CIRCUIT(OR)
 IN A, B
 OUT O
 TRUTH:
-  A B | O
+  A B | O;
   0 0 | 0
   1 0 | 1
   0 1 | 1
@@ -22,7 +22,7 @@ CIRCUIT(NOT)
 IN I
 OUT O
 TRUTH:
-  I | O
+  I | O;
   0 | 1
   1 | 0
 

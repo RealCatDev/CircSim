@@ -47,7 +47,7 @@ namespace CircSim {
     if (isdigit(m_Char)) {
       tok.type = TOKN_NUMBER;
       tok.value = "";
-      while (isdigit(m_Char) || m_Char == '.') {
+      while (isdigit(m_Char)) {
         tok.value += m_Char;
         advance();
       }
@@ -56,7 +56,7 @@ namespace CircSim {
     else if (isalnum(m_Char)) {
       tok.type = TOKN_ID;
       tok.value = "";
-      while (isalnum(m_Char)) {
+      while (isalnum(m_Char) || m_Char == '_') {
         tok.value += m_Char;
         advance();
       }
@@ -67,6 +67,7 @@ namespace CircSim {
       case '(': { tok.type = TOKN_LPAREN; } break;
       case ')': { tok.type = TOKN_RPAREN; } break;
       case ':': { tok.type = TOKN_COLON; } break;
+      case ';': { tok.type = TOKN_SEMI; } break;
       case '=': { tok.type = TOKN_EQUALS; } break;
       case ',': { tok.type = TOKN_COMMA; } break;
       case '|': { tok.type = TOKN_PIPE; } break;
